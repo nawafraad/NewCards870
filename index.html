@@ -15,7 +15,11 @@
     <nav>
       <a href="#products">المنتجات</a>
       <a href="policy.html">السياسة</a>
-      <a class="wa" href="https://wa.me/96500000000" target="_blank" rel="noopener">واتساب الدعم</a>
+      <a class="wa" href="https://wa.me/96550000000" target="_blank" rel="noopener">واتساب الدعم</a>
+      <button class="cart-btn" onclick="toggleCart()">
+        🛒 السلة
+        <span id="cart-count" class="cart-count">0</span>
+      </button>
     </nav>
   </header>
 
@@ -32,7 +36,35 @@
     <small>© 2025 NewCards. جميع الحقوق محفوظة.</small>
   </footer>
 
+  <!-- سلة المشتريات -->
+  <div id="cart-modal" class="cart-modal">
+    <div class="cart-container">
+      <div class="cart-header">
+        <h2>🛒 سلة المشتريات</h2>
+        <button id="close-cart" class="close-btn">✕</button>
+      </div>
+      
+      <div id="empty-cart" class="empty-cart">
+        <p>السلة فارغة</p>
+        <p class="empty-cart-hint">أضف منتجات للبدء</p>
+      </div>
+      
+      <div id="cart-content" class="cart-content" style="display: none;">
+        <div id="cart-items" class="cart-items"></div>
+        
+        <div class="cart-footer">
+          <div class="cart-total-row">
+            <span>الإجمالي:</span>
+            <span id="cart-total" class="cart-total-amount">$0</span>
+          </div>
+          <button id="checkout-btn" class="checkout-btn">إتمام الشراء</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="products.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
+
