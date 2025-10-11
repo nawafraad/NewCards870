@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>نجاح الدفع – NewCards</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <h2>✅ تم الدفع بنجاح</h2>
+    <p>رقم الطلب: <b id="ref"></b></p>
+    <p>المنتج: <b id="pid"></b></p>
+    <p>سيتم تسليم كود البطاقة يدويًا الآن عبر واتساب/إيميل حتى نربط التسليم الآلي.</p>
+    <p><a class="wa" href="index.html">العودة للمتجر</a></p>
+  </main>
+  <script>
+    const p = new URLSearchParams(location.search);
+    document.getElementById('ref').textContent = p.get('ref') || '-';
+    document.getElementById('pid').textContent = p.get('pid') || '-';
+  </script>
+</body>
+</html>

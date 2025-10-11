@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>فشل الدفع – NewCards</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <h2>❌ لم يتم إكمال الدفع</h2>
+    <p>جرّب مرة أخرى، أو تواصل معنا للمساعدة.</p>
+    <p>رقم الطلب (إن وُجد): <b id="ref"></b></p>
+    <p><a class="wa" href="index.html">العودة للمتجر</a></p>
+  </main>
+  <script>
+    const p = new URLSearchParams(location.search);
+    document.getElementById('ref').textContent = p.get('ref') || '-';
+  </script>
+</body>
+</html>
