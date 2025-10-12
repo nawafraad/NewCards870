@@ -75,10 +75,10 @@ function updateCartUI() {
   
   cartItems.innerHTML = cart.map(item => `
     <div class="cart-item">
-      <img src="${item.image}" alt="${item.name}">
+      <img src="${item.img}" alt="${item.name}">
       <div class="cart-item-details">
         <h4>${item.name}</h4>
-        <p>${item.description}</p>
+        <p>${item.desc}</p>
         <p class="cart-item-price">$${item.amount}</p>
       </div>
       <div class="cart-item-actions">
@@ -123,10 +123,10 @@ function displayProducts() {
   
   container.innerHTML = products.map(product => `
     <div class="product-card">
-      <img src="${product.image}" alt="${product.name}">
+      <img src="${product.img}" alt="${product.name}">
       <span class="product-badge">${product.currency}</span>
       <h3>${product.name}</h3>
-      <p>${product.description}</p>
+      <p>${product.desc}</p>
       <p class="product-price">${product.currency} ${product.amount}</p>
       <button onclick='addToCart(${JSON.stringify(product).replace(/'/g, "&#39;")})'>أضف للسلة</button>
     </div>

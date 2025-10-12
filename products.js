@@ -1,5 +1,5 @@
 // منتجات NewCards870 - فئات سعرية متعددة
-window.PRODUCTS = [
+const products = [
   // iTunes Cards
   { id: "itunes-10",  name: "iTunes (10 USD)",  amount: 10,  currency: "USD", desc: "بطاقة iTunes فئة 10$", img: "assets/itunes.jpg", category: "itunes" },
   { id: "itunes-15",  name: "iTunes (15 USD)",  amount: 15,  currency: "USD", desc: "بطاقة iTunes فئة 15$", img: "assets/itunes.jpg", category: "itunes" },
