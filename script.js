@@ -63,40 +63,65 @@ function updateCartUI() {
   const cartCount = document.getElementById('cart-count');
   const cartItems = document.getElementById('cart-items');
   const cartTotal = document.getElementById('cart-total');
+  const emptyCart = document.getElementById('empty-cart');
+  const cartContent = document.getElementById('cart-content');
   
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   cartCount.textContent = totalItems;
   
   if (cart.length === 0) {
-    cartItems.innerHTML = '<p style="text-align:center;padding:20px;color:#666">السلة فارغة</p>';
-    cartTotal.textContent = '$0';
+    if (emptyCart) emptyCart.style.display = 'block';
+    if (cartContent) cartContent.style.display = 'none';
+    if (cartTotal) cartTotal.textContent = '$0';
     return;
   }
   
-  cartItems.innerHTML = cart.map(item => `
-    <div class="cart-item">
-      <img src="${item.img}" alt="${item.name}">
-      <div class="cart-item-details">
-        <h4>${item.name}</h4>
-        <p>${item.desc}</p>
-        <p class="cart-item-price">$${item.amount}</p>
-      </div>
-      <div class="cart-item-actions">
-        <button onclick="updateQuantity('${item.id}', ${item.quantity - 1})">-</button>
-        <span>${item.quantity}</span>
-        <button onclick="updateQuantity('${item.id}', ${item.quantity + 1})">+</button>
-        <button onclick="removeFromCart('${item.id}')" class="remove-btn">حذف</button>
-      </div>
-    </div>
-  `).join('');
+  if (emptyCart) emptyCart.style.display = 'none';
+  if (cartContent) cartContent.style.display = 'flex';
   
-  cartTotal.textContent = `$${getCartTotal()}`;
+  if (cartItems) {
+    cartItems.innerHTML = cart.map(item => `
+      <div class="cart-item">
+        <img class="cart-item-img" src="${item.img}" alt="${item.name}">
+        <div class="cart-item-details">
+          <h4>${item.name}</h4>
+          <p>${item.desc}</p>
+          <div class="cart-item-quantity">
+            <button onclick="updateQuantity('${item.id}', ${item.quantity - 1})">-</button>
+            <span>${item.quantity}</span>
+            <button onclick="updateQuantity('${item.id}', ${item.quantity + 1})">+</button>
+          </div>
+        </div>
+        <div class="cart-item-price">
+          <span class="price">${item.currency} ${item.amount * item.quantity}</span>
+          <button onclick="removeFromCart('${item.id}')" class="remove-btn">حذف</button>
+        </div>
+      </div>
+    `).join('');
+  }
+  
+  if (cartTotal) {
+    cartTotal.textContent = `$${getCartTotal()}`;
+  }
 }
 
 // فتح/إغلاق السلة
 function toggleCart() {
   const modal = document.getElementById('cart-modal');
-  modal.classList.toggle('active');
+  const emptyCart = document.getElementById('empty-cart');
+  const cartContent = document.getElementById('cart-content');
+  
+  modal.classList.toggle('show');
+  
+  // إظهار/إخفاء المحتوى المناسب
+  if (cart.length === 0) {
+    emptyCart.style.display = 'block';
+    cartContent.style.display = 'none';
+  } else {
+    emptyCart.style.display = 'none';
+    cartContent.style.display = 'flex';
+  }
+  
   updateCartUI(); // تحديث السلة عند الفتح
 }
 
@@ -123,13 +148,13 @@ function displayProducts() {
   if (!container) return;
   
   container.innerHTML = products.map(product => `
-    <div class="product-card">
-      <img src="${product.img}" alt="${product.name}">
-      <span class="product-badge">${product.currency}</span>
+    <div class="card">
+      <img class="thumb" src="${product.img}" alt="${product.name}">
+      <span class="badge">${product.currency}</span>
       <h3>${product.name}</h3>
       <p>${product.desc}</p>
-      <p class="product-price">${product.currency} ${product.amount}</p>
-      <button onclick='addToCart(${JSON.stringify(product).replace(/'/g, "&#39;")})'>أضف للسلة</button>
+      <p class="price">${product.currency} ${product.amount}</p>
+      <button class="add-to-cart-btn" onclick='addToCart(${JSON.stringify(product).replace(/'/g, "&#39;")})'>أضف للسلة</button>
     </div>
   `).join('');
 }
