@@ -1,8 +1,10 @@
-/* 
-  NewCards870 - نظام سلة المشتريات مع MyFatoorah
+/*
+  NewCards870 - نظام سلة المشتريات مع Google Apps Script
 */
 
-const API_ENDPOINT = "https://60h5imcl6953.manus.space/api/create-payment";
+// Google Apps Script Web App URL
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx1JFSBYw9GZ8wMVt_8BUhXYGs0KKCwYr8mdVvMByWudQaLdp5t3ZaXQnJi-dvwe3rUvw/exec";
+const CLIENT_SECRET = "NC-Client-Secret-8c1a7e5f";
 const CALLBACK_URL = window.location.origin + "/success.html";
 const ERROR_URL    = window.location.origin + "/error.html";
 
@@ -51,7 +53,7 @@ function updateQuantity(productId, quantity) {
   }
 }
 
-// حساب إجمالي السلة
+// حساب الإجمالي
 function getCartTotal() {
   return cart.reduce((total, item) => total + (item.amount * item.quantity), 0);
 }
@@ -61,49 +63,43 @@ function updateCartUI() {
   const cartCount = document.getElementById('cart-count');
   const cartItems = document.getElementById('cart-items');
   const cartTotal = document.getElementById('cart-total');
-  const emptyCart = document.getElementById('empty-cart');
-  const cartContent = document.getElementById('cart-content');
   
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+  cartCount.textContent = totalItems;
   
-  if (cartCount) {
-    cartCount.textContent = totalItems;
-    cartCount.style.display = totalItems > 0 ? 'block' : 'none';
+  if (cart.length === 0) {
+    cartItems.innerHTML = '<p style="text-align:center;padding:20px;color:#666">السلة فارغة</p>';
+    cartTotal.textContent = '$0';
+    return;
   }
   
-  if (cartItems && cartTotal) {
-    if (cart.length === 0) {
-      if (emptyCart) emptyCart.style.display = 'block';
-      if (cartContent) cartContent.style.display = 'none';
-    } else {
-      if (emptyCart) emptyCart.style.display = 'none';
-      if (cartContent) cartContent.style.display = 'block';
-      
-      cartItems.innerHTML = cart.map(item => `
-        <div class="cart-item">
-          <img src="${item.img}" alt="${item.name}" class="cart-item-img">
-          <div class="cart-item-details">
-            <h4>${item.name}</h4>
-            <p>${item.desc}</p>
-            <div class="cart-item-quantity">
-              <button onclick="updateQuantity('${item.id}', ${item.quantity - 1})">-</button>
-              <span>${item.quantity}</span>
-              <button onclick="updateQuantity('${item.id}', ${item.quantity + 1})">+</button>
-            </div>
-          </div>
-          <div class="cart-item-price">
-            <span class="price">$${item.amount * item.quantity}</span>
-            <button class="remove-btn" onclick="removeFromCart('${item.id}')">حذف</button>
-          </div>
-        </div>
-      `).join('');
-      
-      cartTotal.textContent = `$${getCartTotal()}`;
-    }
-  }
+  cartItems.innerHTML = cart.map(item => `
+    <div class="cart-item">
+      <img src="${item.image}" alt="${item.name}">
+      <div class="cart-item-details">
+        <h4>${item.name}</h4>
+        <p>${item.description}</p>
+        <p class="cart-item-price">$${item.amount}</p>
+      </div>
+      <div class="cart-item-actions">
+        <button onclick="updateQuantity('${item.id}', ${item.quantity - 1})">-</button>
+        <span>${item.quantity}</span>
+        <button onclick="updateQuantity('${item.id}', ${item.quantity + 1})">+</button>
+        <button onclick="removeFromCart('${item.id}')" class="remove-btn">حذف</button>
+      </div>
+    </div>
+  `).join('');
+  
+  cartTotal.textContent = `$${getCartTotal()}`;
 }
 
-// عرض إشعار
+// فتح/إغلاق السلة
+function toggleCart() {
+  const modal = document.getElementById('cart-modal');
+  modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+}
+
+// إظهار الإشعارات
 function showNotification(message) {
   const notification = document.createElement('div');
   notification.className = 'notification';
@@ -120,123 +116,111 @@ function showNotification(message) {
   }, 3000);
 }
 
-// فتح/إغلاق السلة
-function toggleCart() {
-  const cartModal = document.getElementById('cart-modal');
-  if (cartModal) {
-    cartModal.classList.toggle('show');
-  }
-}
-
 // عرض المنتجات
-function renderProducts() {
-  const host = document.getElementById("products");
-  if (!host) return;
+function displayProducts() {
+  const container = document.getElementById('products-container');
+  if (!container) return;
   
-  host.innerHTML = "";
-  (window.PRODUCTS || []).forEach(p => {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
-      <img class="thumb" alt="${p.name}" src="${p.img || 'assets/placeholder.jpg'}" />
-      <div class="badge">${p.currency}</div>
-      <h3>${p.name}</h3>
-      <p>${p.desc || ""}</p>
-      <div class="price">${p.amount} ${p.currency}</div>
-      <button class="add-to-cart-btn" data-id="${p.id}">أضف للسلة</button>
-    `;
-    
-    card.querySelector(".add-to-cart-btn").addEventListener("click", () => addToCart(p));
-    host.appendChild(card);
-  });
+  container.innerHTML = products.map(product => `
+    <div class="product-card">
+      <img src="${product.image}" alt="${product.name}">
+      <span class="product-badge">${product.currency}</span>
+      <h3>${product.name}</h3>
+      <p>${product.description}</p>
+      <p class="product-price">${product.currency} ${product.amount}</p>
+      <button onclick='addToCart(${JSON.stringify(product).replace(/'/g, "&#39;")})'>أضف للسلة</button>
+    </div>
+  `).join('');
 }
 
 // إتمام الشراء
 async function checkout() {
   if (cart.length === 0) {
-    alert("السلة فارغة!");
+    alert('السلة فارغة!');
     return;
   }
   
+  // طلب البريد الإلكتروني
+  const email = prompt('الرجاء إدخال بريدك الإلكتروني لاستلام الأكواد:');
+  if (!email || !email.includes('@')) {
+    alert('الرجاء إدخال بريد إلكتروني صحيح');
+    return;
+  }
+  
+  const name = prompt('الرجاء إدخال اسمك (اختياري):', 'عميل NewCards') || 'عميل NewCards';
+  
+  const checkoutBtn = document.querySelector('#cart-modal button[onclick="checkout()"]');
+  checkoutBtn.disabled = true;
+  checkoutBtn.textContent = 'جاري المعالجة...';
+  
   try {
-    const uid = "ORD-" + Date.now();
-    const totalAmount = getCartTotal();
-    
-    // إنشاء وصف الطلب
-    const itemsDesc = cart.map(item => `${item.name} x${item.quantity}`).join(', ');
-    
-    const payload = {
-      CustomerName: "NewCards Buyer",
-      CustomerEmail: "buyer@example.com",
-      MobileCountryCode: "+965",
-      CustomerMobile: "50000000",
-      InvoiceValue: totalAmount,
-      DisplayCurrencyIso: "USD",
-      CallBackUrl: CALLBACK_URL + "?ref=" + encodeURIComponent(uid),
-      ErrorUrl: ERROR_URL + "?ref=" + encodeURIComponent(uid),
-      Language: "ar",
-      CustomerReference: uid,
-      UserDefinedField: itemsDesc
-    };
-
-    const res = await fetch(API_ENDPOINT, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    });
-
-    if (!res.ok) {
-      const t = await res.text();
-      alert("فشل إنشاء الفاتورة: " + t);
-      console.error("API Error:", t);
-      return;
+    // معالجة كل منتج في السلة
+    for (const item of cart) {
+      const sku = item.id.split('-')[0].toUpperCase(); // ITUNES, PLAYSTATION, etc.
+      const denomination = item.amount.toString();
+      
+      for (let i = 0; i < item.quantity; i++) {
+        const params = new URLSearchParams({
+          action: 'createInvoice',
+          secret: CLIENT_SECRET,
+          email: email,
+          name: name,
+          sku: sku,
+          denomination: denomination,
+          qty: '1',
+          amount: item.amount.toString(),
+          currency: item.currency,
+          returnUrl: CALLBACK_URL
+        });
+        
+        const response = await fetch(`${WEB_APP_URL}?${params.toString()}`, {
+          method: 'GET'
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (!data.ok || !data.InvoiceURL) {
+          throw new Error(data.error || 'فشل إنشاء الفاتورة');
+        }
+        
+        // فتح أول فاتورة فقط (يمكن تحسين هذا لاحقاً)
+        if (i === 0 && cart.indexOf(item) === 0) {
+          // مسح السلة
+          cart = [];
+          saveCart();
+          
+          // التحويل لصفحة الدفع
+          window.location.href = data.InvoiceURL;
+          return;
+        }
+      }
     }
     
-    const data = await res.json();
-    console.log("API Response:", data);
-    
-    if (data?.IsSuccess && data?.Data?.InvoiceURL) {
-      // حفظ الطلب قبل التحويل
-      localStorage.setItem('last_order', JSON.stringify({
-        orderId: uid,
-        items: cart,
-        total: totalAmount,
-        date: new Date().toISOString()
-      }));
-      
-      // مسح السلة
-      cart = [];
-      saveCart();
-      
-      // تحويل للفاتورة
-      window.location.href = data.Data.InvoiceURL;
-    } else {
-      alert("خطأ في إنشاء الفاتورة: " + (data?.Message || "Unknown error"));
-      console.error("Payment Error:", data);
-    }
-  } catch (e) {
-    alert("خطأ في الاتصال: " + e.message);
-    console.error("Network Error:", e);
+  } catch (error) {
+    console.error('Checkout error:', error);
+    alert('حدث خطأ أثناء إنشاء الفاتورة. الرجاء المحاولة مرة أخرى.');
+    checkoutBtn.disabled = false;
+    checkoutBtn.textContent = 'إتمام الشراء';
   }
 }
 
 // تهيئة الصفحة
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', function() {
   loadCart();
-  renderProducts();
+  displayProducts();
   
-  // إضافة مستمع لزر الدفع
-  const checkoutBtn = document.getElementById('checkout-btn');
-  if (checkoutBtn) {
-    checkoutBtn.addEventListener('click', checkout);
-  }
-  
-  // إضافة مستمع لإغلاق السلة
-  const closeCartBtn = document.getElementById('close-cart');
-  if (closeCartBtn) {
-    closeCartBtn.addEventListener('click', toggleCart);
+  // إغلاق السلة عند الضغط خارجها
+  const modal = document.getElementById('cart-modal');
+  if (modal) {
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        toggleCart();
+      }
+    });
   }
 });
 
