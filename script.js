@@ -3,7 +3,7 @@
 */
 
 // Google Apps Script Web App URL
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx1JFSBYw9GZ8wMVt_8BUhXYGs0KKCwYr8mdVvMByWudQaLdp5t3ZaXQnJi-dvwe3rUvw/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwmxM09nwFQ_IudcK3dJozMpOgl9i8NVjSsOLHYrzJzXReVCs4o6-MqgbswHHcdz4Hxlw/exec";
 const CLIENT_SECRET = "NC-Client-Secret-8c1a7e5f";
 const CALLBACK_URL = window.location.origin + "/success.html";
 const ERROR_URL    = window.location.origin + "/error.html";
