@@ -118,7 +118,7 @@ function showNotification(message) {
 
 // عرض المنتجات
 function displayProducts() {
-  const container = document.getElementById('products-container');
+  const container = document.getElementById('products');
   if (!container) return;
   
   container.innerHTML = products.map(product => `
@@ -149,9 +149,11 @@ async function checkout() {
   
   const name = prompt('الرجاء إدخال اسمك (اختياري):', 'عميل NewCards') || 'عميل NewCards';
   
-  const checkoutBtn = document.querySelector('#cart-modal button[onclick="checkout()"]');
-  checkoutBtn.disabled = true;
-  checkoutBtn.textContent = 'جاري المعالجة...';
+  const checkoutBtn = document.getElementById('checkout-btn');
+  if (checkoutBtn) {
+    checkoutBtn.disabled = true;
+    checkoutBtn.textContent = 'جاري المعالجة...';
+  }
   
   try {
     // معالجة كل منتج في السلة
@@ -203,8 +205,11 @@ async function checkout() {
   } catch (error) {
     console.error('Checkout error:', error);
     alert('حدث خطأ أثناء إنشاء الفاتورة. الرجاء المحاولة مرة أخرى.');
-    checkoutBtn.disabled = false;
-    checkoutBtn.textContent = 'إتمام الشراء';
+    const checkoutBtn = document.getElementById('checkout-btn');
+    if (checkoutBtn) {
+      checkoutBtn.disabled = false;
+      checkoutBtn.textContent = 'إتمام الشراء';
+    }
   }
 }
 
@@ -212,6 +217,18 @@ async function checkout() {
 document.addEventListener('DOMContentLoaded', function() {
   loadCart();
   displayProducts();
+  
+  // إضافة event listener لزر checkout
+  const checkoutBtn = document.getElementById('checkout-btn');
+  if (checkoutBtn) {
+    checkoutBtn.addEventListener('click', checkout);
+  }
+  
+  // إضافة event listener لزر إغلاق السلة
+  const closeBtn = document.getElementById('close-cart');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', toggleCart);
+  }
   
   // إغلاق السلة عند الضغط خارجها
   const modal = document.getElementById('cart-modal');
