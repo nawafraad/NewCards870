@@ -96,7 +96,8 @@ function updateCartUI() {
 // فتح/إغلاق السلة
 function toggleCart() {
   const modal = document.getElementById('cart-modal');
-  modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+  modal.classList.toggle('active');
+  updateCartUI(); // تحديث السلة عند الفتح
 }
 
 // إظهار الإشعارات
