@@ -28,5 +28,17 @@ const products = [
   // Amazon Cards
   { id: "amazon-25",  name: "Amazon (25 USD)",  amount: 25,  currency: "USD", desc: "بطاقة Amazon فئة 25$", img: "assets/amazon.jpg", category: "amazon" },
   { id: "amazon-50",  name: "Amazon (50 USD)",  amount: 50,  currency: "USD", desc: "بطاقة Amazon فئة 50$", img: "assets/amazon.jpg", category: "amazon" },
-  { id: "amazon-100", name: "Amazon (100 USD)", amount: 100, currency: "USD", desc: "بطاقة Amazon فئة 100$", img: "assets/amazon.jpg", category: "amazon" }
+  { id: "amazon-100", name: "Amazon (100 USD)", amount: 100, currency: "USD", desc: "بطاقة Amazon فئة 100$", img: "assets/amazon.jpg", category: "amazon" },
+    // Test Product for UAT
+    { 
+        id: "test-product",
+        name: "Test Product (0.50 USD)",
+        amount: 0.50,
+        currency: "USD",
+        desc: "منتج تجريبي لاختبار الدفع بواسطة MyFatoorah",
+        img: "assets/itunes.jpg",
+        category: "test"
+    }
+];
+
 ];
